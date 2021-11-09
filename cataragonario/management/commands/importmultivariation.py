@@ -90,6 +90,7 @@ class Command(BaseCommand):
         wb = load_workbook(filename=self.input_file, read_only=True)
         ws = wb.worksheets[0]
 
+        regions = []
         for i, row in enumerate(ws.values):
             # skip first row because contains headers
             # skip empty rows
@@ -99,10 +100,15 @@ class Command(BaseCommand):
             try:
                 row = RowEntry(row)
             except ValidationError as e:
-                print(e)
+                self.stderr.write(e)
                 raise
 
-            print(row.regions)
+            regions += row.regions
+
+        regions = sorted(set(regions))
+        self.stdout.write(", ".join(regions))
+
+        return regions
 
 
 def extract_regions(value):
