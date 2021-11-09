@@ -1,4 +1,5 @@
 import os
+import pprint
 import sys
 
 from django.core.exceptions import ValidationError
@@ -105,38 +106,61 @@ class Command(BaseCommand):
 
             regions += row.regions
 
-        regions = sorted(set(regions))
-        self.stdout.write(", ".join(regions))
+            self.stdout.write(pprint.pformat(row.regions))
 
         return regions
 
 
 def extract_regions(value):
+    value = value.strip()
     validate_balanced_parenthesis(value)
 
     comma_position = value.find(",")
-    parenthesis_beg_position = value.find("(")
-
     regions = []
     if comma_position == -1:
-        if parenthesis_beg_position == -1:
-            regions.append(value)
-        else:
-            regions.append(value[:parenthesis_beg_position])
-            # TODO extract variants
+        extracted_region = split_region_and_variants(value)
     else:
+        parenthesis_beg_position = value.find("(")
         parenthesis_end_position = value.find(")")
         if comma_position > parenthesis_beg_position and comma_position < parenthesis_end_position:
-            region_left = value[:parenthesis_beg_position]
-            raw = value[parenthesis_end_position + 1:]
+            extracted_region = split_region_and_variants(value)
+            next_comma_position = value.find(",", parenthesis_end_position)
+            if next_comma_position == -1:
+                raw = ''
+            else:
+                raw = value[next_comma_position + 1:]
         else:
             region_left = value[:comma_position]
+            extracted_region = split_region_and_variants(region_left)
             raw = value[comma_position + 1:]
 
-        # TODO extract variants
-        regions = extract_regions(region_left) + extract_regions(raw)
+        if raw:
+            regions += extract_regions(raw)
 
-    return [r.strip() for r in regions if r]
+    regions = [extracted_region] + regions
+
+    return regions
+
+
+def split_region_and_variants(value):
+    parenthesis_beg_position = value.find("(")
+    parenthesis_end_position = value.find(")")
+
+    if parenthesis_beg_position == -1:
+        region = value
+        variants = []
+    else:
+        region = value[:parenthesis_beg_position]
+        variants = value[parenthesis_beg_position + 1:parenthesis_end_position]
+        variants = split_and_strip(variants)
+
+    return (region.strip(), variants)
+
+
+def extract_variants(value):
+    z = split_and_strip(value)
+    print("VARIANT: ", z)
+    return z
 
 
 def split_and_strip(value):
