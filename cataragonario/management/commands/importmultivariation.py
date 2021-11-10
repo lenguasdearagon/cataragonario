@@ -4,7 +4,7 @@ import sys
 
 from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.core.management.base import BaseCommand, CommandError
-from linguatec_lexicon.models import DiatopicVariation, Entry, Lexicon, Word
+from linguatec_lexicon.models import DiatopicVariation, Entry, GramaticalCategory, Lexicon, Word
 from linguatec_lexicon.validators import validate_balanced_parenthesis
 from openpyxl import load_workbook
 
@@ -58,31 +58,22 @@ class Command(BaseCommand):
                     print(e)
                     raise
 
-                # print(row.term, row.gramcats, row.regions, row.cat, row.es)
-
+                gramcats = row.gramcats
                 for es_term in row.es:
                     word, created = Word.objects.get_or_create(lexicon=lex, term=es_term)
 
                     # create entries of normalized catalan
                     for cat_term in row.cat:
-                        try:
-                            entry = Entry.objects.get_or_create(word=word, translation=cat_term)
-                        except:
-                            continue
-
-                        # TODO set gramcats
+                        entry = Entry.objects.create(word=word, translation=cat_term)
+                        entry.gramcats.set(gramcats)
 
                     # create entries of dialectal catalan
                     # DiatopicVariation == Cities | Valleys
                     # Region == County
                     for variation in row.variations:
-                        entry = Entry.objects.get_or_create(word=word, translation=row.term, variation=variation)
+                        entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
+                        entry.gramcats.set(gramcats)
 
-                        # TODO set gramcats
-
-
-                if i > 35:
-                    break
 
     def extract_regions_from_spreadsheet(self):
         wb = load_workbook(filename=self.input_file, read_only=True)
@@ -196,7 +187,15 @@ class RowEntry:
             raise
 
     def clean_gramcats(self, value):
-        return split_and_strip(value)
+        # TODO(@slamora) optimize queries
+        gramcats = []
+        for abbr in  split_and_strip(value):
+            try:
+                gramcats.append(GramaticalCategory.objects.get(abbreviation=abbr))
+            except GramaticalCategory.DoesNotExist as e:
+                raise ValidationError(e)
+
+        return gramcats
 
     def clean_regions(self, value):
         return extract_regions(value)
@@ -218,7 +217,7 @@ class RowEntry:
         for name in variation_names:
             try:
                 variations.append(DiatopicVariation.objects.get(name=name))
-            except (DiatopicVariation.DoesNotExist, MultipleObjectsReturned) as e:
+            except DiatopicVariation.DoesNotExist as e:
                 raise ValidationError(e)
 
         return variations
