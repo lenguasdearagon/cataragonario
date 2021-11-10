@@ -36,48 +36,43 @@ class Command(BaseCommand):
                 'Unexpected filetype "{}". Should be an Excel document (XLSX)'.format(file_extension))
 
     def populate_models(self):
-        # xlsx = pd.read_excel(self.input_file, sheet_name=None, header=None, usecols="A:E",
-        #                      names=['term', 'gramcats', 'regions', 'cat', 'es'])
-
         # TODO remove me
         lex = Lexicon.objects.get(name='castellano-catalán')
         lex.words.all().delete()
         Entry.objects.all().delete()
         # TODO /remove me
 
-        wb = load_workbook(filename=self.input_file, read_only=True)
+        ws = self.load_first_worksheet()
+        for i, row in enumerate(ws.values):
+            if i == 0:
+                continue    # skip first row because contains headers
 
-        for ws in wb:
-            for i, row in enumerate(ws.values):
-                if i == 0:
-                    continue    # skip first row because contains headers
+            try:
+                row = RowEntry(row)
+            except EmptyRow:
+                continue
+            except ValidationError as e:
+                print(e)
+                raise
 
-                try:
-                    row = RowEntry(row)
-                except ValidationError as e:
-                    print(e)
-                    raise
+            gramcats = row.gramcats
+            for es_term in row.es:
+                word, created = Word.objects.get_or_create(lexicon=lex, term=es_term)
 
-                gramcats = row.gramcats
-                for es_term in row.es:
-                    word, created = Word.objects.get_or_create(lexicon=lex, term=es_term)
+                # create entries of normalized catalan
+                for cat_term in row.cat:
+                    entry = Entry.objects.create(word=word, translation=cat_term)
+                    entry.gramcats.set(gramcats)
 
-                    # create entries of normalized catalan
-                    for cat_term in row.cat:
-                        entry = Entry.objects.create(word=word, translation=cat_term)
-                        entry.gramcats.set(gramcats)
-
-                    # create entries of dialectal catalan
-                    # DiatopicVariation == Cities | Valleys
-                    # Region == County
-                    for variation in row.variations:
-                        entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
-                        entry.gramcats.set(gramcats)
-
+                # create entries of dialectal catalan
+                # DiatopicVariation == Cities | Valleys
+                # Region == County
+                for variation in row.variations:
+                    entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
+                    entry.gramcats.set(gramcats)
 
     def extract_regions_from_spreadsheet(self):
-        wb = load_workbook(filename=self.input_file, read_only=True)
-        ws = wb.worksheets[0]
+        ws = self.load_first_worksheet()
 
         regions = []
         for i, row in enumerate(ws.values):
@@ -103,6 +98,14 @@ class Command(BaseCommand):
         self.stdout.write(pprint.pformat(regions_grouped))
 
         return regions_grouped
+
+    def load_first_worksheet(self):
+        wb = load_workbook(filename=self.input_file, read_only=True)
+
+        if len(wb.worksheets) > 1:
+            self.stderr.write("WARNING: only data of first worksheet will be imported.")
+
+        return wb.worksheets[0]
 
 
 def extract_regions(value):
@@ -161,6 +164,10 @@ def split_and_strip(value):
     return [item.strip() for item in value.split(',')]
 
 
+class EmptyRow(Exception):
+    pass
+
+
 class RowEntry:
     fields = ['term', 'gramcats', 'regions', 'cat', 'es']
 
@@ -169,6 +176,9 @@ class RowEntry:
         self.clean()
 
     def clean(self):
+        if not any(self.row):
+            raise EmptyRow()
+
         self.cleaned_data = {}
         for i, fieldname in enumerate(self.fields):
             value = self.row[i]
@@ -179,17 +189,12 @@ class RowEntry:
         return self.cleaned_data
 
     def clean_term(self, value):
-        try:
-            return value.strip()
-        except Exception as e:
-            print(e)
-            import pdb; pdb.set_trace()
-            raise
+        return value.strip()
 
     def clean_gramcats(self, value):
         # TODO(@slamora) optimize queries
         gramcats = []
-        for abbr in  split_and_strip(value):
+        for abbr in split_and_strip(value):
             try:
                 gramcats.append(GramaticalCategory.objects.get(abbreviation=abbr))
             except GramaticalCategory.DoesNotExist as e:
