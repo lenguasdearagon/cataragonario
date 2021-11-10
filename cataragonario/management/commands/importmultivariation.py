@@ -2,7 +2,7 @@ import os
 import pprint
 import sys
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import MultipleObjectsReturned, ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from linguatec_lexicon.models import DiatopicVariation, Entry, Lexicon, Word
 from linguatec_lexicon.validators import validate_balanced_parenthesis
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         #                      names=['term', 'gramcats', 'regions', 'cat', 'es'])
 
         # TODO remove me
-        lex = Lexicon.objects.get(name='es-ca')
+        lex = Lexicon.objects.get(name='castellano-catalán')
         lex.words.all().delete()
         Entry.objects.all().delete()
         # TODO /remove me
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                     print(e)
                     raise
 
-                print(row.term, row.gramcats, row.regions, row.cat, row.es)
+                # print(row.term, row.gramcats, row.regions, row.cat, row.es)
 
                 for es_term in row.es:
                     word, created = Word.objects.get_or_create(lexicon=lex, term=es_term)
@@ -75,11 +75,8 @@ class Command(BaseCommand):
                     # create entries of dialectal catalan
                     # DiatopicVariation == Cities | Valleys
                     # Region == County
-                    # TODO extract first regions & diatopic variations
                     for variation in row.variations:
-                        import pdb; pdb.set_trace()
-                        variation = DiatopicVariation.objects.get(XXX)
-                        entry = Entry.objects.get_or_create(word=word, translation=row.term, variation__name=variation)
+                        entry = Entry.objects.get_or_create(word=word, translation=row.term, variation=variation)
 
                         # TODO set gramcats
 
@@ -106,9 +103,15 @@ class Command(BaseCommand):
 
             regions += row.regions
 
-            self.stdout.write(pprint.pformat(row.regions))
+        regions_grouped = {}
+        for region, cities in regions:
+            if region not in regions_grouped:
+                regions_grouped[region] = set()
+            regions_grouped[region].update(set(cities))
 
-        return regions
+        self.stdout.write(pprint.pformat(regions_grouped))
+
+        return regions_grouped
 
 
 def extract_regions(value):
@@ -168,19 +171,21 @@ def split_and_strip(value):
 
 
 class RowEntry:
-    term = ''
-    gramcats = []
-    regions = []
-    cat = ''
-    es = ''
+    fields = ['term', 'gramcats', 'regions', 'cat', 'es']
 
     def __init__(self, row) -> None:
         self.row = row
-        self.term = self.clean_term(row[0])
-        self.gramcats = self.clean_gramcats(row[1])
-        self.regions = self.clean_regions(row[2])
-        self.cat = self.clean_cat(row[3])
-        self.es = self.clean_es(row[4])
+        self.clean()
+
+    def clean(self):
+        self.cleaned_data = {}
+        for i, fieldname in enumerate(self.fields):
+            value = self.row[i]
+            clean_method = getattr(self, "clean_{}".format(fieldname))
+            self.cleaned_data[fieldname] = clean_method(value)
+            setattr(self, fieldname, self.cleaned_data[fieldname])
+
+        return self.cleaned_data
 
     def clean_term(self, value):
         try:
@@ -201,3 +206,19 @@ class RowEntry:
 
     def clean_es(self, value):
         return split_and_strip(value)
+
+    @property
+    def variations(self):
+        variation_names = []
+        for reg in self.regions:
+            variation_names += reg[1]
+
+        # TODO(@slamora) optimize queries
+        variations = []
+        for name in variation_names:
+            try:
+                variations.append(DiatopicVariation.objects.get(name=name))
+            except (DiatopicVariation.DoesNotExist, MultipleObjectsReturned) as e:
+                raise ValidationError(e)
+
+        return variations
