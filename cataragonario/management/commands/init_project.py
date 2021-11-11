@@ -8,6 +8,7 @@ class Command(BaseCommand):
             '--drop', action='store_true', dest='drop',
             help="Drop existing data before initializing.",
         )
+
     def handle(self, *args, **options):
         if options['drop']:
             self.drop_all()
