@@ -2,7 +2,7 @@ import os
 import pprint
 import sys
 
-from django.core.exceptions import MultipleObjectsReturned, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from linguatec_lexicon.models import DiatopicVariation, Entry, GramaticalCategory, Lexicon, Word
 from linguatec_lexicon.validators import validate_balanced_parenthesis
