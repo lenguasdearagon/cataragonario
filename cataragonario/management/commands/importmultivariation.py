@@ -61,8 +61,9 @@ class Command(BaseCommand):
 
                 # create entries of normalized catalan
                 for cat_term in row.cat:
-                    entry = Entry.objects.create(word=word, translation=cat_term)
-                    entry.gramcats.set(gramcats)
+                    entry, created = Entry.objects.get_or_create(word=word, translation=cat_term, variation__isnull=True)
+                    if created:
+                        entry.gramcats.set(gramcats)
 
                 # create entries of dialectal catalan
                 # DiatopicVariation == Cities | Valleys
