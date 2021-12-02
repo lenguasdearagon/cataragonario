@@ -64,7 +64,7 @@ class ImportLogView(TemplateView):
 
     def retrieve_log_content(self, filename):
         try:
-            content = default_storage.open(filename).readlines()
+            content = default_storage.open(filename, mode='r').read()
         except Exception:
             raise
         return content
