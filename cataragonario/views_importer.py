@@ -1,12 +1,13 @@
 
 import os
 import tempfile
-from django.views.generic.base import TemplateView
-from linguatec_lexicon.forms import ValidatorForm
+import urllib.parse
+from pathlib import Path
 
 from django.core.files.storage import default_storage
 from django.shortcuts import redirect
-from pathlib import Path
+from django.views.generic.base import TemplateView
+from linguatec_lexicon.forms import ValidatorForm
 
 from . import tasks
 
@@ -32,6 +33,7 @@ class ImportMultiVariationValidatorView(TemplateView):
             log_file = self.get_log_filename(tmp_file)
             tasks.run_validator(tmp_file, log_file)
 
+            log_file = urllib.parse.quote_plus(log_file)
             return redirect("catalan-validator-log", name=log_file)
 
         context['form'] = form
@@ -46,9 +48,8 @@ class ImportMultiVariationValidatorView(TemplateView):
         return context
 
     def get_log_filename(self, filename):
-        filename = Path(filename).with_suffix('.log')
-        filename = default_storage.get_valid_name(filename)
-        return default_storage.get_available_name(filename)
+        _, tmp_file = tempfile.mkstemp(suffix='.log')
+        return tmp_file
 
 
 class ImportLogView(TemplateView):
@@ -56,15 +57,17 @@ class ImportLogView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        log_file = urllib.parse.unquote_plus(kwargs['name'])
         context.update({
             'title': "Import log",
-            'output': self.retrieve_log_content(kwargs['name']),
+            'output': self.retrieve_log_content(log_file),
         })
         return context
 
     def retrieve_log_content(self, filename):
         try:
-            content = default_storage.open(filename, mode='r').read()
-        except Exception:
-            raise
+            content = open(filename, mode='r').read()
+        except FileNotFoundError:
+            return None
         return content

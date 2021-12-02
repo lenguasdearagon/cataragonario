@@ -7,7 +7,7 @@ from django.core.management.base import CommandError
 @db_task()
 def run_validator(xlsx_file, log_filename):
     # call_command('importmultivariation', xlsx_file, dry_run=True, no_color=True, verbosity=3, stdout=out)
-    with default_storage.open(log_filename, 'w') as f:
+    with open(log_filename, 'w') as f:
         try:
             call_command('importmultivariation', xlsx_file, no_color=True, verbosity=3, stdout=f, stderr=f)
         except CommandError as e:
