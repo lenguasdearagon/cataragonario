@@ -4,7 +4,7 @@ import sys
 
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
-from linguatec_lexicon.models import DiatopicVariation, Entry, GramaticalCategory, Lexicon, Word
+from linguatec_lexicon.models import DiatopicVariation, Entry, GramaticalCategory, Lexicon, Region, Word
 from linguatec_lexicon.validators import validate_balanced_parenthesis
 from openpyxl import load_workbook
 
@@ -48,12 +48,17 @@ class Command(BaseCommand):
                 continue    # skip first row because contains headers
 
             try:
-                row = RowEntry(row)
+                row = RowEntry(row, line_number=i)
+                row.clean()
             except EmptyRow:
                 continue
-            except ValidationError as e:
-                print(e)
-                raise
+            except ValidationError:
+                for error in row.errors:
+                    self.stderr.write(
+                        "{:<4}: {:<15} {:<2} {:<10}".format(
+                            i, error["word"], error["column"], error["message"])
+                    )
+                continue    # TODO(@slamora): don't save any value if there are errors
 
             gramcats = row.gramcats
             for es_term in row.es:
@@ -83,10 +88,14 @@ class Command(BaseCommand):
                 continue
 
             try:
-                row = RowEntry(row)
-            except ValidationError as e:
-                self.stderr.write(e)
-                raise
+                row = RowEntry(row, line_number=i)
+                row.clean()
+            except ValidationError:
+                # import pdb; pdb.set_trace()
+                import pprint
+                msg = pprint.pformat(row.errors)
+                self.stderr.write(msg)
+                # raise
 
             regions += row.regions
 
@@ -110,7 +119,10 @@ class Command(BaseCommand):
 
 
 def extract_regions(value):
-    value = value.strip()
+    if value is None:
+        return [('franja', ['general'])]
+
+    value = value.strip().lower()
     validate_balanced_parenthesis(value)
 
     comma_position = value.find(",")
@@ -162,6 +174,8 @@ def extract_variants(value):
 
 
 def split_and_strip(value):
+    if value is None:
+        raise TypeError("argument must be a string, not 'None'")
     return [item.strip() for item in value.split(',')]
 
 
@@ -172,20 +186,23 @@ class EmptyRow(Exception):
 class RowEntry:
     fields = ['term', 'gramcats', 'regions', 'cat', 'es']
 
-    def __init__(self, row) -> None:
+    def __init__(self, row, line_number) -> None:
         self.row = row
-        self.clean()
+        self.line_number = line_number
 
     def clean(self):
         if not any(self.row):
             raise EmptyRow()
-
+        self.errors = []
         self.cleaned_data = {}
         for i, fieldname in enumerate(self.fields):
             value = self.row[i]
             clean_method = getattr(self, "clean_{}".format(fieldname))
             self.cleaned_data[fieldname] = clean_method(value)
             setattr(self, fieldname, self.cleaned_data[fieldname])
+
+        if self.errors:
+            raise ValidationError("Errors on line: {}".format(self.line_number))
 
         return self.cleaned_data
 
@@ -198,32 +215,50 @@ class RowEntry:
         for abbr in split_and_strip(value):
             try:
                 gramcats.append(GramaticalCategory.objects.get(abbreviation=abbr))
-            except GramaticalCategory.DoesNotExist as e:
-                raise ValidationError(e)
+            except GramaticalCategory.DoesNotExist:
+                self.add_error("B", "unkown gramatical category '{}'".format(abbr))
 
         return gramcats
 
     def clean_regions(self, value):
-        return extract_regions(value)
+        regions = extract_regions(value)
+        self.variations = []
+        for region, variation_names in regions:
+            try:
+                # TODO(@slamora) translate code to region name
+                r = Region.objects.get(name=region)
+            except Region.DoesNotExist:
+                self.add_error("C", "unkown region '{}'".format(region))
+                r = None
+
+            for name in variation_names:
+                try:
+                    v = DiatopicVariation.objects.get(name=name)
+                except DiatopicVariation.DoesNotExist:
+                    self.add_error("C", "unkown location {}".format(name))
+                else:
+                    if v.region != r:
+                        self.add_error("C", "location {} doesn't belong to region {}".format(v, r))
+                    else:
+                        self.variations.append(v)
+
+        return regions
 
     def clean_cat(self, value):
-        return split_and_strip(value)
+        try:
+            return split_and_strip(value)
+        except TypeError:
+            self.add_error("D", "missing value (this column cannot be empty)")
 
     def clean_es(self, value):
-        return split_and_strip(value)
+        try:
+            return split_and_strip(value)
+        except TypeError:
+            self.add_error("E", "missing value (this column cannot be empty)")
 
-    @property
-    def variations(self):
-        variation_names = []
-        for reg in self.regions:
-            variation_names += reg[1]
-
-        # TODO(@slamora) optimize queries
-        variations = []
-        for name in variation_names:
-            try:
-                variations.append(DiatopicVariation.objects.get(name=name))
-            except DiatopicVariation.DoesNotExist as e:
-                raise ValidationError(e)
-
-        return variations
+    def add_error(self, col, message):
+        self.errors.append({
+            "word": self.term,
+            "column": col,
+            "message": message,
+        })
