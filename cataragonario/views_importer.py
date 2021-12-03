@@ -4,7 +4,7 @@ import tempfile
 import urllib.parse
 from pathlib import Path
 
-from django.core.files.storage import default_storage
+from django.http import Http404
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView
 from linguatec_lexicon.forms import ValidatorForm
@@ -69,5 +69,5 @@ class ImportLogView(TemplateView):
         try:
             content = open(filename, mode='r').read()
         except FileNotFoundError:
-            return None
+            raise Http404("Log does not exist")
         return content
