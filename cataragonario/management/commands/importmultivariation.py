@@ -228,8 +228,13 @@ class RowEntry:
                 # TODO(@slamora) translate code to region name
                 r = Region.objects.get(name=region)
             except Region.DoesNotExist:
-                self.add_error("C", "unkown region '{}'".format(region))
-                r = None
+                # if region doesn't exist, maybe it's a location
+                try:
+                    v = DiatopicVariation.objects.get(name=region)
+                    r = v.region
+                except DiatopicVariation.DoesNotExist:
+                    self.add_error("C", "unkown region '{}'".format(region))
+                    r = None
 
             for name in variation_names:
                 try:
