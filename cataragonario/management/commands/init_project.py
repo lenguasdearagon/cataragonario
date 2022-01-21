@@ -30,25 +30,25 @@ class Command(BaseCommand):
         )
 
     def init_diatopic_variations(self):
-        data = {'bajoara': {'Aiguaviva',
-                            'Bellmunt',
-                            'Belmunt',
-                            'Torrevilella',
-                            'la Codonyera',
-                            'la Ginebrosa'},
-                'caspe': {'Favara'},
-                'cinca': {'Fraga', 'Mequinensa', 'Mequinenza', 'Saidí'},
-                'litera': {'Peralta de la Sal'},
-                'matarranya': {'Massalió',
-                               'Massalíó',
-                               'Vall-de-roures',
-                               'Valljunquera'},
-                'ribagorza': {'Estanya',
-                              'Sopeira',
-                              'Tolba',
-                              'la Pobla de Roda',
-                              'les Paúls',
-                              'les Paüls'}}
+        data = {'bajoara': {'aiguaviva',
+                            'bellmunt',
+                            'bellmunt de mesquí',
+                            'la codonyera',
+                            'la ginebrosa',
+                            'torrevelilla'},
+                'casp': {'favara'},
+                'cinca': {'fraga', 'saidí', 'mequinensa'},
+                'litera': {'peralta de la sal'},
+                'matarranya': {'massalió', 'valljunquera', 'vall-de-roures'},
+                'ribagorza': {'estanya',
+                              'estaya',
+                              'la pobla de roda',
+                              'les paüls',
+                              'sopeira',
+                              'tolba'}}
+
+        # Add special value to handle general usage of the term
+        data['franja'] = {'general'}
 
         for region, variations in data.items():
             r = Region.objects.create(name=region)
