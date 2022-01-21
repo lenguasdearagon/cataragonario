@@ -185,6 +185,9 @@ class EmptyRow(Exception):
 
 class RowEntry:
     fields = ['term', 'gramcats', 'regions', 'cat', 'es']
+    default_error_messages = {
+        'required': 'Required value (this column cannot be empty)',
+    }
 
     def __init__(self, row, line_number) -> None:
         self.row = row
@@ -210,6 +213,10 @@ class RowEntry:
         return value.strip()
 
     def clean_gramcats(self, value):
+        if value is None:
+            self.add_error("C", self.default_error_messages['required'])
+            return []
+
         # TODO(@slamora) optimize queries
         gramcats = []
         for abbr in split_and_strip(value):
@@ -253,13 +260,13 @@ class RowEntry:
         try:
             return split_and_strip(value)
         except TypeError:
-            self.add_error("D", "missing value (this column cannot be empty)")
+            self.add_error("D", self.default_error_messages['required'])
 
     def clean_es(self, value):
         try:
             return split_and_strip(value)
         except TypeError:
-            self.add_error("E", "missing value (this column cannot be empty)")
+            self.add_error("E", self.default_error_messages['required'])
 
     def add_error(self, col, message):
         self.errors.append({
