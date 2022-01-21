@@ -1,5 +1,4 @@
 import os
-import pprint
 import sys
 
 from django.core.exceptions import ValidationError
@@ -42,40 +41,16 @@ class Command(BaseCommand):
         Entry.objects.all().delete()
         # TODO /remove me
 
+        self.lexicon = lex
         ws = self.load_first_worksheet()
         for i, row in enumerate(ws.values):
-            if i == 0:
-                continue    # skip first row because contains headers
-
             try:
-                row = RowEntry(row, line_number=i)
-                row.clean()
-            except EmptyRow:
+                row = self.clean_row(i, row)
+            except (EmptyRow, ValidationError):
+                # TODO(@slamora): don't save any value if there are errors
                 continue
-            except ValidationError:
-                for error in row.errors:
-                    self.stderr.write(
-                        "{:<4}: {:<15} {:<2} {:<10}".format(
-                            i, error["word"], error["column"], error["message"])
-                    )
-                continue    # TODO(@slamora): don't save any value if there are errors
 
-            gramcats = row.gramcats
-            for es_term in row.es:
-                word, created = Word.objects.get_or_create(lexicon=lex, term=es_term)
-
-                # create entries of normalized catalan
-                for cat_term in row.cat:
-                    entry, created = Entry.objects.get_or_create(word=word, translation=cat_term, variation__isnull=True)
-                    if created:
-                        entry.gramcats.set(gramcats)
-
-                # create entries of dialectal catalan
-                # DiatopicVariation == Cities | Valleys
-                # Region == County
-                for variation in row.variations:
-                    entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
-                    entry.gramcats.set(gramcats)
+            self.save_row(row)
 
     def extract_regions_from_spreadsheet(self):
         ws = self.load_first_worksheet()
@@ -116,6 +91,44 @@ class Command(BaseCommand):
             self.stderr.write("WARNING: only data of first worksheet will be imported.")
 
         return wb.worksheets[0]
+
+    def clean_row(self, i, row):
+        if i == 0:
+            raise EmptyRow('Skip header')    # skip first row because contains headers
+
+        try:
+            row = RowEntry(row, line_number=i)
+            row.clean()
+        except EmptyRow:
+            raise
+        except ValidationError:
+            for error in row.errors:
+                self.stderr.write(
+                    "{:<4}: {:<15} {:<2} {:<10}".format(
+                        i, error["word"], error["column"], error["message"])
+                )
+            raise
+
+        return row
+
+    def save_row(self, row):
+            gramcats = row.gramcats
+            for es_term in row.es:
+                word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
+
+                # create entries of normalized catalan
+                for cat_term in row.cat:
+                    entry, created = Entry.objects.get_or_create(
+                        word=word, translation=cat_term, variation__isnull=True)
+                    if created:
+                        entry.gramcats.set(gramcats)
+
+                # create entries of dialectal catalan
+                # DiatopicVariation == Cities | Valleys
+                # Region == County
+                for variation in row.variations:
+                    entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
+                    entry.gramcats.set(gramcats)
 
 
 def extract_regions(value):
