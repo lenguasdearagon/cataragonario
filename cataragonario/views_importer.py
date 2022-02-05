@@ -1,8 +1,6 @@
-
 import os
 import tempfile
 import urllib.parse
-from pathlib import Path
 
 from django.http import Http404
 from django.shortcuts import redirect
