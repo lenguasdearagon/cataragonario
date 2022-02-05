@@ -66,7 +66,6 @@ class Command(BaseCommand):
                 row = RowEntry(row, line_number=i)
                 row.clean()
             except ValidationError:
-                # import pdb; pdb.set_trace()
                 import pprint
                 msg = pprint.pformat(row.errors)
                 self.stderr.write(msg)
