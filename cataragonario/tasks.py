@@ -12,3 +12,5 @@ def run_validator(xlsx_file, log_filename):
         except CommandError as e:
             exception_details = getattr(e, 'message', repr(e))
             f.write(exception_details)
+
+        f.write("OK: no errors found!")
