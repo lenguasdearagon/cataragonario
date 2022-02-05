@@ -1,0 +1,187 @@
+{
+    "id": 3460,
+    "url": "http://127.0.0.1:1234/api/words/3460/",
+    "lexicon": "es-ca",
+    "term": "petirrojo",
+    "gramcats": [
+        "s. m."
+    ],
+    "entries": [
+        {
+            "id": 13041,
+            "variation": {
+                "name": "bellmunt",
+                "abbreviation": "bellmunt",
+                "region": "bajoara"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pi-roget",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13037,
+            "variation": {
+                "name": "torrevelilla",
+                "abbreviation": "torrevelilla",
+                "region": "bajoara"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pipi-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13040,
+            "variation": {
+                "name": "la codonyera",
+                "abbreviation": "la codonyera",
+                "region": "bajoara"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pepi-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13038,
+            "variation": {
+                "name": "la ginebrosa",
+                "abbreviation": "la ginebrosa",
+                "region": "bajoara"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pipi-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13036,
+            "variation": {
+                "name": "favara",
+                "abbreviation": "favara",
+                "region": "casp"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pipi-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13035,
+            "variation": {
+                "name": "mequinensa",
+                "abbreviation": "mequinensa",
+                "region": "cinca"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "papa-roget",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13034,
+            "variation": {
+                "name": "peralta de la sal",
+                "abbreviation": "peralta de la sal",
+                "region": "litera"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pap-roi",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13042,
+            "variation": {
+                "name": "vall-de-roures",
+                "abbreviation": "vall-de-roures",
+                "region": "matarranya"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pin-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13039,
+            "variation": {
+                "name": "massalió",
+                "abbreviation": "massalió",
+                "region": "matarranya"
+            },
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pipi-roi",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        },
+        {
+            "id": 13033,
+            "variation": null,
+            "gramcats": [
+                {
+                    "abbreviation": "s. m.",
+                    "title": "sustantivo masculino"
+                }
+            ],
+            "translation": "pit-roig",
+            "marked_translation": "",
+            "examples": [],
+            "conjugation": null
+        }
+    ]
+}
