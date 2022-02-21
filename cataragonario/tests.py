@@ -19,17 +19,17 @@ class RowEntryTest(TestCase):
 
     def test_single_region_with_variation(self):
         value = "bajoara (la Codonyera)"
-        expected = [("bajoara", ["la Codonyera"]), ]
+        expected = [("bajoara", ["la codonyera"]), ]
         self.extract_and_assert(value, expected)
 
     def test_single_region_multi_variation(self):
         value = "bajoara (Torrevilella, Aiguaviva)"
-        expected = [("bajoara", ["Torrevilella", "Aiguaviva"]), ]
+        expected = [("bajoara", ["torrevilella", "aiguaviva"]), ]
         self.extract_and_assert(value, expected)
 
     def test_multi_region(self):
         value = "ribagorza (Sopeira), cinca (Saidí, Mequinensa)"
-        expected = [("ribagorza", ["Sopeira"]), ("cinca", ["Saidí", "Mequinensa"])]
+        expected = [("ribagorza", ["sopeira"]), ("cinca", ["saidí", "mequinensa"])]
         self.extract_and_assert(value, expected)
 
     def test_multi_region_without_variation(self):
@@ -39,7 +39,7 @@ class RowEntryTest(TestCase):
 
     def test_several_regions(self):
         value = "ribagorza (Sopeira), cinca (Saidí, Mequinensa), bajoara"
-        expected = [("ribagorza", ["Sopeira"]), ("cinca", ["Saidí", "Mequinensa"]), ("bajoara", [])]
+        expected = [("ribagorza", ["sopeira"]), ("cinca", ["saidí", "mequinensa"]), ("bajoara", [])]
         self.extract_and_assert(value, expected)
 
     def test_several_regions_without_variation(self):
