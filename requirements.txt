@@ -1,2 +1,3 @@
 -e git+https://github.com/lenguasdearagon/aragonario.git#egg=linguatec_lexicon
 huey
+redis   # huey task storage
