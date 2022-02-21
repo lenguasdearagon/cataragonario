@@ -58,6 +58,11 @@ jobs:
         # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --max-line-length=120 --exclude=migrations,src/linguatec-lexicon --statistics
 
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.4.0
+      with:
+        redis-version: 5
+
     - name: Run Tests
       run: |
         coverage run --source cataragonario runtests.py --settings tests.settings_postgres_github --parallel 1
