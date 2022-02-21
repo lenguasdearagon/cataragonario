@@ -39,6 +39,11 @@ class Command(BaseCommand):
             raise CommandError(
                 'Unexpected filetype "{}". Should be an Excel document (XLSX)'.format(file_extension))
 
+        if not os.path.exists(self.input_file):
+            raise CommandError(
+                'File "{}" not found.'.format(self.input_file)
+            )
+
     def drop_existing_data(self):
         self.lexicon.words.all().delete()
         Entry.objects.all().delete()
