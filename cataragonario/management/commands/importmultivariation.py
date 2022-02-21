@@ -11,6 +11,7 @@ from openpyxl import load_workbook
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('input_file', type=str)
+        parser.add_argument('--drop', action='store_true', dest='drop', help="Drop existing data before import.")
         parser.add_argument(
             '--extract-regions', action='store_true', dest='extract_regions',
             help="Extract regions from input file.",
@@ -21,6 +22,10 @@ class Command(BaseCommand):
         self.verbosity = options['verbosity']
 
         self.validate_input_file()
+        self.lexicon = Lexicon.objects.get(name='castellano-catalán')
+
+        if options['drop']:
+            self.drop_existing_data()
 
         if options['extract_regions']:
             self.extract_regions_from_spreadsheet()
@@ -34,14 +39,11 @@ class Command(BaseCommand):
             raise CommandError(
                 'Unexpected filetype "{}". Should be an Excel document (XLSX)'.format(file_extension))
 
-    def populate_models(self):
-        # TODO remove me
-        lex = Lexicon.objects.get(name='castellano-catalán')
-        lex.words.all().delete()
+    def drop_existing_data(self):
+        self.lexicon.words.all().delete()
         Entry.objects.all().delete()
-        # TODO /remove me
 
-        self.lexicon = lex
+    def populate_models(self):
         ws = self.load_first_worksheet()
         for i, row in enumerate(ws.values):
             try:
