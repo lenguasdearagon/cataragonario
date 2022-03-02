@@ -1,0 +1,338 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 3459,
+            "url": "http://127.0.0.1:1234/api/words/3459/",
+            "lexicon": "es-ca",
+            "term": "golondrina",
+            "gramcats": [
+                "s. f."
+            ],
+            "entries": [
+                {
+                    "id": 13023,
+                    "variation": {
+                        "name": "bellmunt",
+                        "abbreviation": "bellmunt",
+                        "region": "bajoara"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "orineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13032,
+                    "variation": {
+                        "name": "aiguaviva",
+                        "abbreviation": "aiguaviva",
+                        "region": "bajoara"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "gruneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13031,
+                    "variation": {
+                        "name": "torrevelilla",
+                        "abbreviation": "torrevelilla",
+                        "region": "bajoara"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "gruneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13030,
+                    "variation": {
+                        "name": "la codonyera",
+                        "abbreviation": "la codonyera",
+                        "region": "bajoara"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "colondrina",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13022,
+                    "variation": {
+                        "name": "la ginebrosa",
+                        "abbreviation": "la ginebrosa",
+                        "region": "bajoara"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "orineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13027,
+                    "variation": {
+                        "name": "favara",
+                        "abbreviation": "favara",
+                        "region": "casp"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oroneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13024,
+                    "variation": {
+                        "name": "fraga",
+                        "abbreviation": "fraga",
+                        "region": "cinca"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "engrineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13025,
+                    "variation": {
+                        "name": "mequinensa",
+                        "abbreviation": "mequinensa",
+                        "region": "cinca"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "aurineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13020,
+                    "variation": {
+                        "name": "peralta de la sal",
+                        "abbreviation": "peralta de la sal",
+                        "region": "litera"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "orineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13029,
+                    "variation": {
+                        "name": "vall-de-roures",
+                        "abbreviation": "vall-de-roures",
+                        "region": "matarranya"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oroneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13021,
+                    "variation": {
+                        "name": "valljunquera",
+                        "abbreviation": "valljunquera",
+                        "region": "matarranya"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "orineta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13028,
+                    "variation": {
+                        "name": "massalió",
+                        "abbreviation": "massalió",
+                        "region": "matarranya"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oroneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13017,
+                    "variation": {
+                        "name": "sopeira",
+                        "abbreviation": "sopeira",
+                        "region": "ribagorza"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "bolandrina",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13019,
+                    "variation": {
+                        "name": "estanya",
+                        "abbreviation": "estanya",
+                        "region": "ribagorza"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oreneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13016,
+                    "variation": {
+                        "name": "les paüls",
+                        "abbreviation": "les paüls",
+                        "region": "ribagorza"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "bolandrina",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13018,
+                    "variation": {
+                        "name": "la pobla de roda",
+                        "abbreviation": "la pobla de roda",
+                        "region": "ribagorza"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "golondrina",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13026,
+                    "variation": {
+                        "name": "tolba",
+                        "abbreviation": "tolba",
+                        "region": "ribagorza"
+                    },
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oroneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                },
+                {
+                    "id": 13015,
+                    "variation": null,
+                    "gramcats": [
+                        {
+                            "abbreviation": "s. f.",
+                            "title": "sustantivo femenino"
+                        }
+                    ],
+                    "translation": "oreneta",
+                    "marked_translation": "",
+                    "examples": [],
+                    "conjugation": null
+                }
+            ]
+        }
+    ]
+}
