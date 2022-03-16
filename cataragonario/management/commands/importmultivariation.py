@@ -49,17 +49,20 @@ class Command(BaseCommand):
         Entry.objects.all().delete()
 
     def populate_models(self):
-        ws = self.load_first_worksheet()
-        for i, row in enumerate(ws.values):
-            try:
-                row = self.clean_row(i, row)
-            except (EmptyRow, ValidationError):
-                # TODO(@slamora): don't save any value if there are errors
-                continue
+        worksheets = self.load_worksheets()
+        for ws in worksheets:
+            for i, row in enumerate(ws.values):
+                try:
+                    # TODO(@slamora) pass information about worksheet
+                    row = self.clean_row(i + 1, row, ws.title)
+                except (EmptyRow, ValidationError):
+                    # TODO(@slamora): don't save any value if there are errors
+                    continue
 
-            self.save_row(row)
+                self.save_row(row)
 
     def extract_regions_from_spreadsheet(self):
+        # TODO(@slamora) extract from all worksheets
         ws = self.load_first_worksheet()
 
         regions = []
@@ -70,7 +73,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                row = RowEntry(row, line_number=i)
+                row = RowEntry(row, line_number=i + 1)
                 row.clean()
             except ValidationError:
                 import pprint
@@ -98,20 +101,24 @@ class Command(BaseCommand):
 
         return wb.worksheets[0]
 
-    def clean_row(self, i, row):
-        if i == 0:
+    def load_worksheets(self):
+        wb = load_workbook(filename=self.input_file, read_only=True)
+        return wb.worksheets
+
+    def clean_row(self, line_number, row, worksheet):
+        if line_number == 1:
             raise EmptyRow('Skip header')    # skip first row because contains headers
 
         try:
-            row = RowEntry(row, line_number=i)
+            row = RowEntry(row, line_number=line_number, worksheet=worksheet)
             row.clean()
         except EmptyRow:
             raise
         except ValidationError:
             for error in row.errors:
                 self.stderr.write(
-                    "{:<4}: {:<15} {:<2} {:<10}".format(
-                        i, error["word"], error["column"], error["message"])
+                    "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                        worksheet, line_number, error["word"], error["column"], error["message"])
                 )
             raise
 
@@ -208,9 +215,10 @@ class RowEntry:
         'required': 'Required value (this column cannot be empty)',
     }
 
-    def __init__(self, row, line_number) -> None:
+    def __init__(self, row, line_number, worksheet=None) -> None:
         self.row = row
         self.line_number = line_number
+        self.worksheet = worksheet
 
     def clean(self):
         if not any(self.row):
