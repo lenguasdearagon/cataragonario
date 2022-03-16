@@ -131,17 +131,28 @@ class Command(BaseCommand):
 
                 # create entries of normalized catalan
                 for cat_term in row.cat:
-                    entry, created = Entry.objects.get_or_create(
+                    entry, cat_created = Entry.objects.get_or_create(
                         word=word, translation=cat_term, variation__isnull=True)
-                    if created:
+                    if cat_created:
                         entry.gramcats.set(gramcats)
 
                 # create entries of dialectal catalan
                 # DiatopicVariation == Cities | Valleys
                 # Region == County
                 for variation in row.variations:
-                    entry = Entry.objects.create(word=word, translation=row.term, variation=variation)
-                    entry.gramcats.set(gramcats)
+                    entry, variation_created = Entry.objects.get_or_create(
+                        word=word, translation=row.term, variation=variation)
+
+                    if variation_created:
+                        entry.gramcats.set(gramcats)
+
+                    elif not cat_created and not created:
+                        # possible duplicate because word.term cat entry & variation entry already exists
+                        msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
+                        self.stderr.write(
+                           "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                                row.worksheet, row.line_number, word.term, "", msg)
+                        )
 
 
 def extract_regions(value):
