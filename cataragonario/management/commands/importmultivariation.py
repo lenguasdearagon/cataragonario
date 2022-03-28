@@ -318,18 +318,22 @@ class RowEntry:
                     r = None
 
             # transform variation_names to objects
-            for name in variation_names:
-                try:
-                    v = DiatopicVariation.objects.get(name__iexact=name)
-                except DiatopicVariation.DoesNotExist:
-                    self.add_error("C", "unkown location {}".format(name))
-                else:
-                    if v.region != r:
-                        self.add_error("C", "location {} doesn't belong to region {}".format(v, r))
-                    else:
-                        self.variations.append(v)
+            for variation in variation_names:
+                self.add_location_if_belongs_to_region(r, variation)
 
         return regions
+
+    def add_location_if_belongs_to_region(self, region, variation):
+        try:
+            v = DiatopicVariation.objects.get(name__iexact=variation)
+        except DiatopicVariation.DoesNotExist:
+            self.add_error("C", "unkown location {}".format(variation))
+        else:
+            if v.region != region:
+                self.add_error("C", "location {} doesn't belong to region {}".format(v, region))
+            else:
+                self.variations.append(v)
+
 
     def clean_cat(self, value):
         try:
