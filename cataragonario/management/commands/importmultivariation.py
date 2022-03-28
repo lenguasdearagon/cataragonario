@@ -32,6 +32,9 @@ class Command(BaseCommand):
             sys.exit(0)
 
         self.populate_models()
+        self.stdout.write("ES: {}   CAT: {}     FRANJA: {}".format(self.es, self.cat, self.aralan))
+        self.stdout.write("rows: {}     errors: {}".format(self.rows, self.rows_errors))
+        self.stdout.write("-- THE END! --")
 
     def validate_input_file(self):
         _, file_extension = os.path.splitext(self.input_file)
@@ -50,15 +53,23 @@ class Command(BaseCommand):
 
     def populate_models(self):
         worksheets = self.load_worksheets()
+        self.es = 0
+        self.cat = 0
+        self.aralan = 0
+        self.rows = 0
+        self.rows_errors = 0
         for ws in worksheets:
             for i, row in enumerate(ws.values):
                 try:
-                    # TODO(@slamora) pass information about worksheet
                     row = self.clean_row(i + 1, row, ws.title)
-                except (EmptyRow, ValidationError):
+                except EmptyRow:
+                    continue
+                except ValidationError as e:
                     # TODO(@slamora): don't save any value if there are errors
+                    self.rows_errors += 1
                     continue
 
+                self.rows += 1
                 self.save_row(row)
 
     def extract_regions_from_spreadsheet(self):
@@ -121,6 +132,12 @@ class Command(BaseCommand):
                         worksheet, line_number, error["word"], error["column"], error["message"])
                 )
             raise
+        # handle another kind of errors
+        except Exception as e:
+            self.stderr.write(
+                "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                    worksheet, line_number, error["word"], "", str(e))
+            )
 
         return row
 
@@ -128,6 +145,7 @@ class Command(BaseCommand):
             gramcats = row.gramcats
             for es_term in row.es:
                 word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
+                if created: self.es += 1
 
                 # create entries of normalized catalan
                 for cat_term in row.cat:
@@ -135,6 +153,7 @@ class Command(BaseCommand):
                         word=word, translation=cat_term, variation__isnull=True)
                     if cat_created:
                         entry.gramcats.set(gramcats)
+                        self.cat += 1
 
                 # create entries of dialectal catalan
                 # DiatopicVariation == Cities | Valleys
@@ -145,7 +164,7 @@ class Command(BaseCommand):
 
                     if variation_created:
                         entry.gramcats.set(gramcats)
-
+                        self.aralan += 1
                     elif not cat_created and not created:
                         # possible duplicate because word.term cat entry & variation entry already exists
                         msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
