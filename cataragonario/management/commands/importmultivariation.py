@@ -285,6 +285,13 @@ class RowEntry:
         return gramcats
 
     def clean_regions(self, value):
+        """
+        Populate variations based on regions provided by user.
+        Two formats are accepted:
+            legacy: region (variation) e.g. cinca (Fraga)
+            simple: CSV region|variation e.g. Vall-de-roures
+        """
+        # TODO(@slamora) refactor based on defined use cases
         try:
             regions = extract_regions(value)
         except ValidationError as e:
@@ -296,15 +303,21 @@ class RowEntry:
             try:
                 # TODO(@slamora) translate code to region name
                 r = Region.objects.get(name=region)
+                if not variation_names:
+                    variation_names = [r.name]
+
             except Region.DoesNotExist:
                 # if region doesn't exist, maybe it's a location
                 try:
                     v = DiatopicVariation.objects.get(name=region)
                     r = v.region
+                    self.variations.append(v)
+                    continue
                 except DiatopicVariation.DoesNotExist:
                     self.add_error("C", "unkown region '{}'".format(region))
                     r = None
 
+            # transform variation_names to objects
             for name in variation_names:
                 try:
                     v = DiatopicVariation.objects.get(name=name)
