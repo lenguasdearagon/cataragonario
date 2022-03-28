@@ -30,27 +30,27 @@ class Command(BaseCommand):
         )
 
     def init_diatopic_variations(self):
-        data = {'bajoara': {'aiguaviva',
-                            'bajoara',
-                            'bellmunt',
-                            'bellmunt de mesquí',
-                            'la codonyera',
-                            'la ginebrosa',
-                            'torrevelilla'},
-                'casp': {'casp', 'favara'},
-                'cinca': {'cinca', 'fraga', 'saidí', 'mequinensa'},
-                'litera': {'litera', 'peralta de la sal'},
-                'matarranya': {'matarranya', 'massalió', 'valljunquera', 'vall-de-roures'},
-                'ribagorza': {'ribagorza',
-                              'estanya',
-                              'estaya',
-                              'la pobla de roda',
-                              'les paüls',
-                              'sopeira',
-                              'tolba'}}
+        data = {'Bajoara': {'Aiguaviva',
+                            'Bajoara',
+                            'Bellmunt',
+                            'Bellmunt de mesquí',
+                            'La Codonyera',
+                            'La Ginebrosa',
+                            'Torrevelilla'},
+                'Casp': {'Casp', 'Favara'},
+                'Cinca': {'Cinca', 'Fraga', 'Saidí', 'Mequinensa'},
+                'Litera': {'Litera', 'Peralta de la Sal'},
+                'Matarranya': {'Matarranya', 'Massalió', 'Valljunquera', 'Vall-de-Roures'},
+                'Ribagorza': {'Ribagorza',
+                              'Estanya',
+                              'Estaya',
+                              'La Pobla de Roda',
+                              'Les Paüls',
+                              'Sopeira',
+                              'Tolba'}}
 
         # Add special value to handle general usage of the term
-        data['franja'] = {'general'}
+        data['Franja'] = {'general'}
 
         for region, variations in data.items():
             r = Region.objects.create(name=region)

@@ -85,40 +85,45 @@ class RowEntryRegionTest(TestCase):
 
     def test_only_region(self):
         value = "ribagorza"
-        expected = ["ribagorza"]
+        expected = ["Ribagorza"]
         self.extract_and_assert(value, expected)
 
     def test_only_variation(self):
         value = "la codonyera"
-        expected = ["la codonyera"]
+        expected = ["La Codonyera"]
         self.extract_and_assert(value, expected)
 
     def test_several_regions_without_variation(self):
         value = "ribagorza, litera, bajoara"
-        expected = ["ribagorza", "litera", "bajoara"]
+        expected = ["Ribagorza", "Litera", "Bajoara"]
         self.extract_and_assert(value, expected)
 
     def test_single_region_with_variation(self):
         value = "bajoara (la Codonyera)"
-        expected = ["la codonyera"]
+        expected = ["La Codonyera"]
         self.extract_and_assert(value, expected)
 
     def test_single_region_multi_variation(self):
         value = "bajoara (Torrevelilla, Aiguaviva)"
-        expected = ["torrevelilla", "aiguaviva"]
+        expected = ["Torrevelilla", "Aiguaviva"]
         self.extract_and_assert(value, expected)
 
     def test_multi_region(self):
         value = "ribagorza (Sopeira), cinca (Saidí, Mequinensa)"
-        expected = ["sopeira", "saidí", "mequinensa"]
+        expected = ["Sopeira", "Saidí", "Mequinensa"]
         self.extract_and_assert(value, expected)
 
     def test_multi_region_without_variation(self):
         value = "ribagorza, litera"
-        expected = ["ribagorza", "litera"]
+        expected = ["Ribagorza", "Litera"]
         self.extract_and_assert(value, expected)
 
     def test_several_regions(self):
         value = "ribagorza (Sopeira), cinca (Saidí, Mequinensa), bajoara"
-        expected = ["sopeira", "saidí", "mequinensa", "bajoara"]
+        expected = ["Sopeira", "Saidí", "Mequinensa", "Bajoara"]
+        self.extract_and_assert(value, expected)
+
+    def test_region_case_insensitive_match(self):
+        value = "riBagOrza"
+        expected = ["Ribagorza"]
         self.extract_and_assert(value, expected)
