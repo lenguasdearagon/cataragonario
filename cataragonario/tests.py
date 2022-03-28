@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from cataragonario.management.commands.importmultivariation import extract_regions
@@ -46,3 +47,7 @@ class RowEntryTest(TestCase):
         value = "ribagorza, litera, bajoara"
         expected = [("ribagorza", []), ("litera", []), ("bajoara", [])]
         self.extract_and_assert(value, expected)
+
+    def test_unbalanced_parenthesis(self):
+        value = "ribagorza (Les Paüls), matarranya (Vall-de-roures("
+        self.assertRaises(ValidationError, extract_regions, value)

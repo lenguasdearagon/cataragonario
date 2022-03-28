@@ -266,7 +266,12 @@ class RowEntry:
         return gramcats
 
     def clean_regions(self, value):
-        regions = extract_regions(value)
+        try:
+            regions = extract_regions(value)
+        except ValidationError as e:
+            self.add_error("C", str(e))
+            return
+
         self.variations = []
         for region, variation_names in regions:
             try:
