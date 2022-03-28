@@ -16,15 +16,23 @@ class ImportMultivariationTest(TestCase):
         call_command("importgramcat", os.path.join(BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
         super().setUpTestData()
 
-    def test_a(self):
-        call_command("importmultivariation", os.path.join(BASE_DIR, "../tests/data/multiple-items.xlsx"))
+    def get_data_full_path(self, filename):
+        return os.path.join(BASE_DIR, "../tests/data/", filename)
 
+    def test_a(self):
+        call_command("importmultivariation", self.get_data_full_path("multiple-items.xlsx"))
         self.assertEqual(2, Word.objects.count())
         self.assertEqual(2, Entry.objects.filter(variation__isnull=True).count())
         self.assertEqual(10, Entry.objects.filter(variation__isnull=False).count())
 
     def test_b(self):
-        call_command("importmultivariation", os.path.join(BASE_DIR, "../tests/data/entry-with-multiple-variations.xlsx"))
+        call_command("importmultivariation", self.get_data_full_path("entry-with-multiple-variations.xlsx"))
         self.assertEqual(1, Word.objects.count())
         self.assertEqual(1, Entry.objects.filter(variation__isnull=True).count())
+        self.assertEqual(3, Entry.objects.filter(variation__isnull=False).count())
+
+    def test_c(self):
+        call_command("importmultivariation", self.get_data_full_path("entry-with-different-words.xlsx"))
+        self.assertEqual(2, Word.objects.count())
+        self.assertEqual(2, Entry.objects.filter(variation__isnull=True).count())
         self.assertEqual(3, Entry.objects.filter(variation__isnull=False).count())
