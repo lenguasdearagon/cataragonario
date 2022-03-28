@@ -13,7 +13,8 @@ class ImportMultivariationTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         call_command("init_project")
-        call_command("importgramcat", os.path.join(BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
+        call_command("importgramcat", os.path.join(
+            BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
         super().setUpTestData()
 
     def get_data_full_path(self, filename):

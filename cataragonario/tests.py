@@ -62,7 +62,8 @@ class RowEntryRegionTest(TestCase):
     def setUpTestData(cls) -> None:
         super().setUpTestData()
         call_command("init_project")
-        call_command("importgramcat", os.path.join(BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
+        call_command("importgramcat", os.path.join(
+            BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
 
     def extract_and_assert(self, value, expected):
         from cataragonario.management.commands.importmultivariation import RowEntry
