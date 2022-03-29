@@ -1,24 +1,24 @@
-import os
 from pathlib import Path
 
+import linguatec_lexicon
 from django.core.management import call_command
 from django.test import TestCase
 
 from linguatec_lexicon.models import Entry, Word
 
 BASE_DIR = Path(__file__).resolve().parent
+LINGUATEC_DIR = Path(linguatec_lexicon.__file__).parent
 
 
 class ImportMultivariationTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         call_command("init_project")
-        call_command("importgramcat", os.path.join(
-            BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
+        call_command("importgramcat", LINGUATEC_DIR.parent.joinpath('tests/fixtures/gramcat-es-ar.csv'))
         super().setUpTestData()
 
     def get_data_full_path(self, filename):
-        return os.path.join(BASE_DIR, "../tests/data/", filename)
+        return BASE_DIR.parent.joinpath("tests/data/", filename)
 
     def test_a(self):
         call_command("importmultivariation", self.get_data_full_path("multiple-items.xlsx"))

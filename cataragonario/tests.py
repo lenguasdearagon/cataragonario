@@ -1,13 +1,14 @@
-import os
 from pathlib import Path
 
+import linguatec_lexicon
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.test import TestCase
 
 from cataragonario.management.commands.importmultivariation import extract_regions
 
-BASE_DIR = Path(__file__).resolve().parent
+LINGUATEC_DIR = Path(linguatec_lexicon.__file__).parent
+
 
 class RowEntryTest(TestCase):
     def extract_and_assert(self, value, expected):
@@ -57,16 +58,17 @@ class RowEntryTest(TestCase):
         value = "ribagorza (Les Paüls), matarranya (Vall-de-roures("
         self.assertRaises(ValidationError, extract_regions, value)
 
+
 class RowEntryRegionTest(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         super().setUpTestData()
         call_command("init_project")
-        call_command("importgramcat", os.path.join(
-            BASE_DIR, "../env/src/linguatec-lexicon/tests/fixtures/gramcat-es-ar.csv"))
+        call_command("importgramcat", LINGUATEC_DIR.parent.joinpath('tests/fixtures/gramcat-es-ar.csv'))
 
     def extract_and_assert(self, value, expected):
-        from cataragonario.management.commands.importmultivariation import RowEntry
+        from cataragonario.management.commands.importmultivariation import \
+            RowEntry
         row = RowEntry(('bota', 's. f.', value, 'bota', 'bota'), 2)
         row.errors = []
 
