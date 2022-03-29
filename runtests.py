@@ -45,6 +45,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'linguatec_lexicon',
+    'cataragonario',
     'tests',
 ]
 
