@@ -1,12 +1,12 @@
 from django.contrib.postgres.search import TrigramSimilarity
 from linguatec_lexicon.models import Entry, Word
-from linguatec_lexicon.serializers import WordNearSerializer, WordSerializer
+from linguatec_lexicon.serializers import WordNearSerializer
 from linguatec_lexicon.views import DefaultLimitOffsetPagination
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .serializers import EntryNearSerializer
+from .serializers import EntryNearSerializer, WordSerializer
 
 MODE_DIALECTAL = 'dialectal'
 MODE_REVERSE = 'reverse'
