@@ -30,24 +30,39 @@ class Command(BaseCommand):
         )
 
     def init_diatopic_variations(self):
-        data = {'Bajoara': {'Aiguaviva',
-                            'Bajoara',
-                            'Bellmunt',
-                            'Bellmunt de mesquí',
-                            'La Codonyera',
-                            'La Ginebrosa',
-                            'Torrevelilla'},
-                'Casp': {'Casp', 'Favara'},
-                'Cinca': {'Cinca', 'Fraga', 'Saidí', 'Mequinensa'},
-                'Litera': {'Litera', 'Peralta de la Sal'},
-                'Matarranya': {'Matarranya', 'Massalió', 'Valljunquera', 'Vall-de-Roures'},
-                'Ribagorza': {'Ribagorza',
-                              'Estanya',
-                              'Estaya',
-                              'La Pobla de Roda',
-                              'Les Paüls',
-                              'Sopeira',
-                              'Tolba'}}
+        data = {
+            'Bajoara': {
+                'Bajoara',
+                'Aiguaviva',
+                'Bellmunt',
+                'Bellmunt de Mesquí',
+                'La Codonyera',
+                'La Ginebrosa',
+                'Torrevelilla'
+            },
+            'Casp': {
+                'Casp', 'Faió', 'Favara'
+            },
+            'Cinca': {
+                'Cinca', 'Fraga', 'Mequinensa', 'Saidí'
+            },
+            'Litera': {
+                'Litera', 'Açanui', 'Albelda', 'Peralta de la Sal'
+            },
+            'Matarranya': {
+                'Matarranya', 'Calaceit', 'Massalió', 'Pena-roja', 'Vall-de-roures', 'Valljunquera'
+            },
+            'Ribagorza': {
+                'Ribagorza',
+                'Areny',
+                'Estanya',
+                'La Pobla de Roda',
+                'Noals',
+                'Les Paüls',
+                'Sopeira',
+                'Tolba',
+            }
+        }
 
         # Add special value to handle general usage of the term
         data['Franja'] = {'general'}
