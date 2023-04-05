@@ -1,3 +1,5 @@
+import sys
+
 from django.core.management.base import BaseCommand
 from linguatec_lexicon.models import DiatopicVariation, Lexicon, Region
 
@@ -8,10 +10,18 @@ class Command(BaseCommand):
             '--drop', action='store_true', dest='drop',
             help="Drop existing data before initializing.",
         )
+        parser.add_argument(
+            '--fix-regions', action='store_true', dest='fix_regions',
+            help="Translate regions code to their official name.",
+        )
 
     def handle(self, *args, **options):
         if options['drop']:
             self.drop_all()
+
+        if options['fix_regions']:
+            self.fix_region_and_variation_names()
+            sys.exit(0)
 
         self.init_lexicon()
         self.init_diatopic_variations()
@@ -72,3 +82,19 @@ class Command(BaseCommand):
             DiatopicVariation.objects.bulk_create([
                 DiatopicVariation(name=name, abbreviation=name, region=r) for name in variations
             ])
+
+    def fix_region_and_variation_names(self=None):
+        """
+        Translate regions code to their official name and update DiatopicVariation related to it.
+        """
+        data = {
+            "bajoara": "Bajo Aragón",
+            "casp": "Baix Aragó-Casp",
+            "cinca": "Baix Cinca",
+            "litera": "La Llitera",
+            "matarranya": "Matarranya",
+            "ribagorza": "La Ribagorza",
+        }
+        for key, value in data.items():
+            Region.objects.filter(name__iexact=key).update(name=value)
+            DiatopicVariation.objects.filter(name__iexact=key).update(name=value)
