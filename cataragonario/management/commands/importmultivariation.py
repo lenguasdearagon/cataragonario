@@ -148,35 +148,36 @@ class Command(BaseCommand):
         return row
 
     def save_row(self, row):
-            gramcats = row.gramcats
-            for es_term in row.es:
-                word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
-                if created: self.es += 1
+        gramcats = row.gramcats
+        for es_term in row.es:
+            word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
+            if created:
+                self.es += 1
 
-                # create entries of normalized catalan
-                for cat_term in row.cat:
-                    entry, cat_created = Entry.objects.get_or_create(
-                        word=word, translation=cat_term, variation__isnull=True)
-                    if cat_created:
-                        entry.gramcats.set(gramcats)
-                        self.cat += 1
+            # create entries of normalized catalan
+            for cat_term in row.cat:
+                entry, cat_created = Entry.objects.get_or_create(
+                    word=word, translation=cat_term, variation__isnull=True)
+                if cat_created:
+                    entry.gramcats.set(gramcats)
+                    self.cat += 1
 
-                # create entries of dialectal catalan
-                # DiatopicVariation == Cities | Valleys
-                # Region == County
-                for variation in row.variations:
-                    entry, variation_created = Entry.objects.get_or_create(
-                        word=word, translation=row.term, variation=variation)
+            # create entries of dialectal catalan
+            # DiatopicVariation == Cities | Valleys
+            # Region == County
+            for variation in row.variations:
+                entry, variation_created = Entry.objects.get_or_create(
+                    word=word, translation=row.term, variation=variation)
 
-                    if variation_created:
-                        entry.gramcats.set(gramcats)
-                        self.aralan += 1
-                    elif not cat_created and not created:
-                        # possible duplicate because word.term cat entry & variation entry already exists
-                        msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
-                        self.stderr.write(
-                           "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
-                                row.worksheet, row.line_number, word.term, "", msg)
+                if variation_created:
+                    entry.gramcats.set(gramcats)
+                    self.aralan += 1
+                elif not cat_created and not created:
+                    # possible duplicate because word.term cat entry & variation entry already exists
+                    msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
+                    self.stderr.write(
+                        "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                            row.worksheet, row.line_number, word.term, "", msg)
                         )
 
 
