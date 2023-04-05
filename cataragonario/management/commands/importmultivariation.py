@@ -173,12 +173,15 @@ class Command(BaseCommand):
                     entry.gramcats.set(gramcats)
                     self.aralan += 1
                 elif not cat_created and not created:
-                    # possible duplicate because word.term cat entry & variation entry already exists
-                    msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
-                    self.stderr.write(
-                        "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
-                            row.worksheet, row.line_number, word.term, "", msg)
-                        )
+                    # DB structure relation between `es` <--> `cat variation` and it doesn't take in account
+                    # column D of Excel (normative catalan). So some rows are marked as duplicated.
+                    # This could be ignored without because any data is losed.
+                    if self.verbosity > 2:
+                        msg = f"Possible duplicated row (unique-entry): {row.term} ({variation}) // {cat_term}"
+                        self.stderr.write(
+                            "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                                row.worksheet, row.line_number, word.term, "", msg)
+                            )
 
 
 def extract_regions(value):
