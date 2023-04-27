@@ -40,3 +40,34 @@ python manage.py runserver
 ```
 
 You got it! Let's start creating magical code!
+
+
+### Postgres database using docker
+Start postgres using docker
+```sh
+POSTGRES_DB='cataragonario'
+POSTGRES_USER='lenguasdearagon'
+POSTGRES_PASSWORD='verys3cr3tp@as$'
+POSTGRES__HOST='localhost'
+POSTGRES_PORT=5432
+
+docker run --name cataragonario -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD -e POSTGRES_USER=$POSTGRES_USER -e POSTGRES_DB=$POSTGRES_DB -p $POSTGRES_PORT:$POSTGRES_PORT -d postgres
+```
+
+## Deployment using uwsgi
+```sh
+git clone git@github.com:lenguasdearagon/cataragonario.git
+cd cataragonario
+
+# create virtual environment
+python3 -m venv env
+. env/bin/activate
+
+# install dependencies
+pip install wheel
+pip install -r aralan/requirements.txt
+pip install -r env/src/linguatec-lexicon/requirements.txt
+
+# install uwsgi (suit your taste: e.g. gunicorn)
+pip install uwsgi
+```
