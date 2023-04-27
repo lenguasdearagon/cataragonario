@@ -1,5 +1,4 @@
-from django.conf.urls import include, url
-from django.urls import path
+from django.urls import include, path
 from linguatec_lexicon import views as aragonario_views
 from rest_framework import routers
 
@@ -13,7 +12,7 @@ router.register(r'words', views.WordViewSet)
 
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    path('', include(router.urls)),
     path('validator/', views_importer.ImportMultiVariationValidatorView.as_view(), name='catalan-validator'),
     path('validator/logs/<name>/', views_importer.ImportLogView.as_view(), name='catalan-validator-log'),
 ]

@@ -73,36 +73,42 @@ class Command(BaseCommand):
                 self.save_row(row)
 
     def extract_regions_from_spreadsheet(self):
-        # TODO(@slamora) extract from all worksheets
-        ws = self.load_first_worksheet()
 
-        regions = []
-        for i, row in enumerate(ws.values):
-            # skip first row because contains headers
-            # skip empty rows
-            if i == 0 or not any(row):
-                continue
+        def extract_r(ws):
+            regions = []
+            for i, row in enumerate(ws.values):
+                # skip first row because contains headers
+                # skip empty rows
+                if i == 0 or not any(row):
+                    continue
 
-            try:
-                row = RowEntry(row, line_number=i + 1)
-                row.clean()
-            except ValidationError:
-                import pprint
-                msg = pprint.pformat(row.errors)
-                self.stderr.write(msg)
-                # raise
+                try:
+                    row = RowEntry(row, line_number=i + 1)
+                    row.clean()
+                except ValidationError:
+                    import pprint
+                    msg = pprint.pformat(row.errors)
+                    self.stderr.write(msg)
+                    # raise
 
-            regions += row.regions
+                regions += row.regions
 
-        regions_grouped = {}
-        for region, cities in regions:
-            if region not in regions_grouped:
-                regions_grouped[region] = set()
-            regions_grouped[region].update(set(cities))
+            regions_grouped = {}
+            for region, cities in regions:
+                if region not in regions_grouped:
+                    regions_grouped[region] = set()
+                regions_grouped[region].update(set(cities))
 
-        self.stdout.write(pprint.pformat(regions_grouped))
+            self.stdout.write(pprint.pformat(regions_grouped))
 
-        return regions_grouped
+            return regions_grouped
+
+        global_regions = {}
+        for ws in self.load_worksheets():
+            z = extract_r(ws)
+            global_regions.update(z)
+
+        return global_regions
 
     def load_first_worksheet(self):
         wb = load_workbook(filename=self.input_file, read_only=True)
@@ -142,36 +148,40 @@ class Command(BaseCommand):
         return row
 
     def save_row(self, row):
-            gramcats = row.gramcats
-            for es_term in row.es:
-                word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
-                if created: self.es += 1
+        gramcats = row.gramcats
+        for es_term in row.es:
+            word, created = Word.objects.get_or_create(lexicon=self.lexicon, term=es_term)
+            if created:
+                self.es += 1
 
-                # create entries of normalized catalan
-                for cat_term in row.cat:
-                    entry, cat_created = Entry.objects.get_or_create(
-                        word=word, translation=cat_term, variation__isnull=True)
-                    if cat_created:
-                        entry.gramcats.set(gramcats)
-                        self.cat += 1
+            # create entries of normalized catalan
+            for cat_term in row.cat:
+                entry, cat_created = Entry.objects.get_or_create(
+                    word=word, translation=cat_term, variation__isnull=True)
+                if cat_created:
+                    entry.gramcats.set(gramcats)
+                    self.cat += 1
 
-                # create entries of dialectal catalan
-                # DiatopicVariation == Cities | Valleys
-                # Region == County
-                for variation in row.variations:
-                    entry, variation_created = Entry.objects.get_or_create(
-                        word=word, translation=row.term, variation=variation)
+            # create entries of dialectal catalan
+            # DiatopicVariation == Cities | Valleys
+            # Region == County
+            for variation in row.variations:
+                entry, variation_created = Entry.objects.get_or_create(
+                    word=word, translation=row.term, variation=variation)
 
-                    if variation_created:
-                        entry.gramcats.set(gramcats)
-                        self.aralan += 1
-                    elif not cat_created and not created:
-                        # possible duplicate because word.term cat entry & variation entry already exists
-                        msg = "Possible duplicated row (unique-entry): {} {}".format(row.term, cat_term)
+                if variation_created:
+                    entry.gramcats.set(gramcats)
+                    self.aralan += 1
+                elif not cat_created and not created:
+                    # DB structure relation between `es` <--> `cat variation` and it doesn't take in account
+                    # column D of Excel (normative catalan). So some rows are marked as duplicated.
+                    # This could be ignored without because any data is losed.
+                    if self.verbosity > 2:
+                        msg = f"Possible duplicated row (unique-entry): {row.term} ({variation}) // {cat_term}"
                         self.stderr.write(
-                           "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
+                            "{:>8}.{:<4}: {:<15} {:<2} {:<10}".format(
                                 row.worksheet, row.line_number, word.term, "", msg)
-                        )
+                            )
 
 
 def extract_regions(value):
